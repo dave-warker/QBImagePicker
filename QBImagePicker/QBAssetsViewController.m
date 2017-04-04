@@ -411,8 +411,12 @@ static CGSize CGSizeScale(CGSize size, CGFloat scale) {
                     
                     NSIndexSet *changedIndexes = [collectionChanges changedIndexes];
                     if ([changedIndexes count]) {
-                        [self.collectionView reloadItemsAtIndexPaths:[changedIndexes qb_indexPathsFromIndexesWithSection:0]];
-                    }
+                        // Fablic's photoLibraryDidChange crash fix
+                        // https://github.com/Fablic/QBImagePicker/commit/879d484940f039afb8e7d5d8ee3877a235e660b2
+                        NSMutableIndexSet *changedWithoutRemovalsIndexes = [changedIndexes mutableCopy];
+                        [changedWithoutRemovalsIndexes removeIndexes:removedIndexes];
+                        [self.collectionView reloadItemsAtIndexPaths:[changedWithoutRemovalsIndexes qb_indexPathsFromIndexesWithSection:0]];
+                      }
                 } completion:NULL];
             }
             
